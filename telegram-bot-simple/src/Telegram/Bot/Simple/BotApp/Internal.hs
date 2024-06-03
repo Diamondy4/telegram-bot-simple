@@ -122,7 +122,9 @@ processActionsIndefinitely
   :: BotApp model action -> BotEnv model action -> IO ThreadId
 processActionsIndefinitely botApp botEnv = do
   a <- asyncLink $ forever $ do
-    runClientM (processActionJob botApp botEnv) (botClientEnv botEnv)
+    runClientM (processActionJob botApp botEnv) (botClientEnv botEnv) >>= \x -> case x of
+      Right _ -> pure ()
+      Left e -> print e
   return (asyncThreadId a)
 
 -- | Start 'Telegram.Update' polling for a bot.
